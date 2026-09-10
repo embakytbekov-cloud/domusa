@@ -93,7 +93,19 @@ export function FeedScreen() {
             </div>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", textDecoration: "underline", flex: "none", cursor: "pointer" }}>Все</div>
           </div>
-          <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "11px 18px 2px", scrollSnapType: "x mandatory" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              overflowX: "auto",
+              padding: "11px 18px 2px",
+              scrollSnapType: "x mandatory",
+              // scroll-padding, а не просто padding — иначе snap прижимает
+              // карточки вплотную к краю экрана после прокрутки.
+              scrollPaddingLeft: 18,
+              scrollPaddingRight: 18,
+            }}
+          >
             {r.items.map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}

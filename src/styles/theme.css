@@ -34,6 +34,13 @@
   --radius-lg: 18px;
   --radius-xl: 24px;
 
+  /* Безопасные отступы: --tg-safe-area-inset-* — аппаратный вырез/чёлка
+     устройства, --tg-content-safe-area-inset-* — дополнительный отступ,
+     который Telegram просит оставить под свои плавающие кнопки (Закрыть,
+     меню) поверх контента. env(safe-area-inset-top) — запасной вариант
+     вне Telegram (например, PWA в обычном мобильном браузере). */
+  --app-safe-top: max(calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px)), env(safe-area-inset-top, 0px));
+
   color-scheme: light;
 }
 

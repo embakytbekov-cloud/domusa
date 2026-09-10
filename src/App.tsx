@@ -51,6 +51,8 @@ export default function App() {
         flexDirection: "column",
         position: "relative",
         boxShadow: "0 0 60px rgba(20,16,13,.08)",
+        // Отступ сверху, чтобы хедер не оказывался под кнопкой "Закрыть" Telegram.
+        paddingTop: "var(--app-safe-top)",
       }}
     >
       {isDetail && <TopBar title="Объявление" />}

@@ -112,6 +112,8 @@ export interface Dict {
     becomeHostBanner: string;
     becomeHostCta: string;
     becomeHostSub: string;
+    guestName: string;
+    openInTelegram: string;
   };
   gate: {
     dismiss: string;
@@ -124,6 +126,7 @@ export interface Dict {
     addTabSub: string;
     addPublishTitle: string;
     addPublishSub: string;
+    requiresTelegram: string;
   };
   toast: {
     bookRequested: string;
@@ -131,6 +134,7 @@ export interface Dict {
     fillRequired: string;
     published: string;
     publishError: string;
+    linkFailed: string;
   };
   amenity: {
     wifi: string;

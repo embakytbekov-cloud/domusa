@@ -2,17 +2,14 @@ import WebApp from "@twa-dev/sdk";
 import type { TelegramUser } from "../types/listing";
 
 // Обёртка над Telegram WebApp SDK. Внутри Telegram initDataUnsafe.user
-// заполнен автоматически; вне Telegram (обычный браузер при разработке)
-// подставляем тестового пользователя, чтобы экраны можно было смотреть
-// в обычном браузере командой `npm run dev`.
-
-const FALLBACK_USER: TelegramUser = {
-  id: 0,
-  name: "Алексей Ковалёв",
-  first: "Алексей",
-  username: "alexk",
-  photo: "",
-};
+// заполнен реальными данными пользователя (id, имя, фамилия, юзернейм,
+// фото профиля) — их и читаем. Вне Telegram (обычный браузер) реальных
+// данных нет: раньше здесь подставлялся фиктивный пользователь "Алексей
+// Ковалёв", из-за чего экраны можно было пройти без настоящей Supabase-
+// сессии и позже ловить "Нет активной сессии Supabase" при загрузке фото
+// или публикации. Теперь никакого фолбэка нет — getTelegramUser()
+// возвращает null, и действия, требующие профиля, явно просят открыть
+// приложение в Telegram (см. gate() в src/store/appStore.ts).
 
 export function initTelegram() {
   try {
@@ -23,27 +20,26 @@ export function initTelegram() {
   }
 }
 
-export function getTelegramUser(): TelegramUser {
+export function getTelegramUser(): TelegramUser | null {
   try {
     const u = WebApp.initDataUnsafe?.user;
-    if (u) {
-      return {
-        id: u.id,
-        name: [u.first_name, u.last_name].filter(Boolean).join(" "),
-        first: u.first_name || "друг",
-        username: u.username || "",
-        photo: u.photo_url || "",
-      };
-    }
+    if (!u) return null;
+    return {
+      id: u.id,
+      name: [u.first_name, u.last_name].filter(Boolean).join(" ") || u.first_name,
+      first: u.first_name,
+      username: u.username || "",
+      photo: u.photo_url || "",
+    };
   } catch {
     // вне Telegram WebApp.initDataUnsafe недоступен
+    return null;
   }
-  return FALLBACK_USER;
 }
 
 // initData — подписанная Telegram строка, которую нужно передать на бэкенд
-// (Supabase Edge Function) для проверки подлинности пользователя по HMAC
-// с секретом бота. См. supabase/functions/telegram-auth в README_RU.md.
+// (Supabase Edge Function telegram-link) для проверки подлинности
+// пользователя по HMAC с секретом бота — см. src/lib/auth.ts.
 export function getTelegramInitData(): string {
   try {
     return WebApp.initData || "";

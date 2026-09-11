@@ -95,6 +95,8 @@ export const tr = {
       "Tek dokunuşla ev sahibi olun — profiliniz Telegram üzerinden onaylanır, form doldurmaya gerek yok.",
     becomeHostCta: "Ev sahibi olun",
     becomeHostSub: "Profilinizi Telegram üzerinden onaylıyoruz — form doldurmaya gerek yok.",
+    guestName: "Misafir",
+    openInTelegram: "Telegram'da aç",
   },
   gate: {
     dismiss: "Şimdi değil",
@@ -107,6 +109,7 @@ export const tr = {
     addTabSub: "Konutu $3 karşılığında yayınlamak için Telegram profilinizi onaylayalım. Form doldurmaya gerek yok.",
     addPublishTitle: "Lütfen kendinizi tanıtın",
     addPublishSub: "Konutu yayınlamak için profilinizi onaylayalım. İlk ilan ücretsiz, sonraki her ilan — $3.",
+    requiresTelegram: "Devam etmek için uygulamayı Telegram'da açın",
   },
   toast: {
     bookRequested: "Talep ev sahibine gönderildi — genellikle bir saat içinde yanıt verir",
@@ -114,6 +117,7 @@ export const tr = {
     fillRequired: "Başlığı ve fiyatı doldurun",
     published: "İlan yayınlandı — akışta zaten görünüyor",
     publishError: "Yayınlanamadı. Bağlantınızı kontrol edip tekrar deneyin.",
+    linkFailed: "Telegram profili doğrulanamadı. Lütfen tekrar deneyin.",
   },
   amenity: {
     wifi: "Wi-Fi",

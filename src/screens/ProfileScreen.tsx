@@ -11,13 +11,19 @@ export function ProfileScreen() {
 
   const currentLanguageName = LANGUAGES.find((l) => l.code === language)?.nativeName ?? language;
 
-  const initials = user.name
+  // Вне Telegram (initDataUnsafe.user недоступен) реальных данных нет —
+  // раньше здесь всегда стоял фиктивный "Алексей Ковалёв"; теперь честно
+  // показываем нейтральную заглушку-гостя и просим открыть в Telegram.
+  const displayName = user?.name || t("profile.guestName");
+  const initials = displayName
     .split(" ")
     .map((w) => w[0])
     .join("")
     .slice(0, 2);
 
-  const handle = (user.username ? `@${user.username} · ` : "") + (registered ? t("profile.handleRegistered") : t("profile.handleGuest"));
+  const handle = user
+    ? (user.username ? `@${user.username} · ` : "") + (registered ? t("profile.handleRegistered") : t("profile.handleGuest"))
+    : t("profile.openInTelegram");
 
   const rows = [
     { id: "bookings", label: t("profile.bookings"), value: "2" },
@@ -28,7 +34,7 @@ export function ProfileScreen() {
   ];
 
   const verifyNow = () =>
-    gate(() => {}, t("profile.becomeHostCta"), t("profile.becomeHostSub"), t("gate.continueAs", { name: user.first }));
+    gate(() => {}, t("profile.becomeHostCta"), t("profile.becomeHostSub"), t("gate.continueAs", { name: user?.first ?? "" }));
 
   return (
     <div style={{ animation: "fadeIn .25s ease", padding: "18px 20px 100px" }}>
@@ -36,10 +42,10 @@ export function ProfileScreen() {
 
       <div style={{ display: "flex", alignItems: "center", gap: 14, padding: 16, borderRadius: 20, background: "#fff", border: "1px solid var(--ink-08)" }}>
         <div style={{ width: 56, height: 56, borderRadius: 28, background: "var(--avatar-bg)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: "var(--avatar-fg)", overflow: "hidden", flex: "none" }}>
-          {user.photo ? <img src={user.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /> : <span>{initials}</span>}
+          {user?.photo ? <img src={user.photo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /> : <span>{initials}</span>}
         </div>
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)" }}>{user.name}</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "var(--ink)" }}>{displayName}</div>
           <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink-50)" }}>{handle}</div>
         </div>
       </div>

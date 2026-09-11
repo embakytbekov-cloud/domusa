@@ -95,6 +95,8 @@ export const uz = {
       "Bir tugma bosish bilan ijaraga beruvchi bo'ling — profil Telegram orqali tasdiqlanadi, anketa to'ldirish shart emas.",
     becomeHostCta: "Ijaraga beruvchi bo'lish",
     becomeHostSub: "Profilni Telegram orqali tasdiqlaymiz — anketa to'ldirish shart emas.",
+    guestName: "Mehmon",
+    openInTelegram: "Telegram orqali oching",
   },
   gate: {
     dismiss: "Hozir emas",
@@ -107,6 +109,7 @@ export const uz = {
     addTabSub: "Uy-joyni $3 ga e'lon qilish uchun Telegram profilingizni tasdiqlaymiz. Anketa to'ldirish shart emas.",
     addPublishTitle: "Iltimos, o'zingizni tanishtiring",
     addPublishSub: "Uy-joyni e'lon qilish uchun profilni tasdiqlaymiz. Birinchi e'lon bepul, keyingisi — $3.",
+    requiresTelegram: "Davom etish uchun ilovani Telegram orqali oching",
   },
   toast: {
     bookRequested: "So'rov egasiga yuborildi — odatda bir soat ichida javob beradi",
@@ -114,6 +117,7 @@ export const uz = {
     fillRequired: "Sarlavha va narxni to'ldiring",
     published: "E'lon joylandi — u allaqachon lentada",
     publishError: "Joylab bo'lmadi. Ulanishni tekshirib, qayta urinib ko'ring.",
+    linkFailed: "Telegram profilini tasdiqlab bo'lmadi. Qayta urinib ko'ring.",
   },
   amenity: {
     wifi: "Wi-Fi",

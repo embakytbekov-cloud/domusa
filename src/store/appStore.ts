@@ -51,7 +51,7 @@ interface AppState {
   // геолокация — ближайший к пользователю город (см. src/lib/geolocation.ts)
   nearestCity: string | null;
 
-  user: TelegramUser;
+  user: TelegramUser | null;
   registered: boolean;
   pending: GateRequest | null;
 
@@ -151,7 +151,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         },
         t("gate.addTabTitle"),
         t("gate.addTabSub"),
-        t("gate.continueAs", { name: get().user.first })
+        t("gate.continueAs", { name: get().user?.first ?? "" })
       );
       return;
     }
@@ -187,7 +187,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       doToggle,
       t("gate.saveTitle"),
       t("gate.saveSub"),
-      t("gate.continueAs", { name: get().user.first })
+      t("gate.continueAs", { name: get().user?.first ?? "" })
     );
   },
 
@@ -203,7 +203,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       },
       t("gate.bookTitle"),
       t("gate.bookSub"),
-      t("gate.continueAs", { name: get().user.first })
+      t("gate.continueAs", { name: get().user?.first ?? "" })
     );
   },
 
@@ -212,17 +212,33 @@ export const useAppStore = create<AppState>((set, get) => ({
       action();
       return;
     }
+    // Без реального Telegram-пользователя (id/имя из initDataUnsafe) не
+    // из чего строить ни модалку подтверждения, ни настоящую Supabase-
+    // сессию — вместо фиктивного профиля просто просим открыть приложение
+    // в Telegram.
+    if (!get().user) {
+      get().flash(t("gate.requiresTelegram"));
+      return;
+    }
     set({ pending: { action, title, sub, cta } });
   },
   confirmGate: async () => {
     const pending = get().pending;
     // Настоящая Supabase-сессия (анонимный вход + привязка Telegram-
-    // профиля через Edge Function telegram-link) нужна до того, как
-    // пользователь попадёт на экраны, которые пишут в Supabase напрямую —
-    // загрузка фото и публикация объявления. Без .env (supabaseEnabled
-    // = false) функция ничего не делает и приложение остаётся на моках.
+    // профиля через Edge Function telegram-link, проверяющую подлинность
+    // initData по HMAC с секретом бота) нужна до того, как пользователь
+    // попадёт на экраны, которые пишут в Supabase напрямую — загрузка
+    // фото и публикация объявления. Без .env (supabaseEnabled = false)
+    // ничего не делаем и приложение остаётся на моках; если Supabase
+    // подключён, а привязка не удалась (например, секрет бота ещё не
+    // настроен в Supabase) — не притворяемся, что пользователь
+    // подтверждён, иначе дальше словим "Нет активной сессии Supabase".
     if (supabaseEnabled) {
-      await linkTelegramProfile();
+      const linked = await linkTelegramProfile();
+      if (!linked) {
+        get().flash(t("toast.linkFailed"));
+        return;
+      }
     }
     set({ registered: true, pending: null });
     get().flash(t("toast.profileConfirmed"));
@@ -321,7 +337,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       },
       t("gate.addPublishTitle"),
       t("gate.addPublishSub"),
-      t("gate.continueAs", { name: get().user.first })
+      t("gate.continueAs", { name: get().user?.first ?? "" })
     );
   },
 

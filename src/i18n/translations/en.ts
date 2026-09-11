@@ -95,6 +95,8 @@ export const en = {
       "Become a host in one tap — your profile is verified through Telegram, no forms to fill out.",
     becomeHostCta: "Become a host",
     becomeHostSub: "We verify your profile through Telegram — no forms to fill out.",
+    guestName: "Guest",
+    openInTelegram: "Open in Telegram",
   },
   gate: {
     dismiss: "Not now",
@@ -107,6 +109,7 @@ export const en = {
     addTabSub: "To publish a listing for $3, let's verify your Telegram profile. No forms needed.",
     addPublishTitle: "Please introduce yourself",
     addPublishSub: "To publish a listing, let's verify your profile. Your first listing is free, each next one — $3.",
+    requiresTelegram: "Open this app in Telegram to continue",
   },
   toast: {
     bookRequested: "Request sent to the host — they usually reply within an hour",
@@ -114,6 +117,7 @@ export const en = {
     fillRequired: "Fill in the title and price",
     published: "Listing published — it's already live in the feed",
     publishError: "Couldn't publish. Check your connection and try again.",
+    linkFailed: "Couldn't confirm your Telegram profile. Please try again.",
   },
   amenity: {
     wifi: "Wi-Fi",

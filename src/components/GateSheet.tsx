@@ -8,7 +8,10 @@ export function GateSheet() {
   const user = useAppStore((s) => s.user);
   const t = useT();
 
-  if (!pending) return null;
+  // gate() в appStore не открывает эту модалку без настоящего Telegram-
+  // пользователя (см. src/store/appStore.ts), так что user здесь всегда
+  // определён — проверка ниже просто защищает TypeScript-типы.
+  if (!pending || !user) return null;
 
   return (
     <>

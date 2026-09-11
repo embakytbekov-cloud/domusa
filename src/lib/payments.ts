@@ -1,4 +1,4 @@
-import WebApp from "@twa-dev/sdk";
+import { getWebApp } from "./telegram";
 import { supabase, supabaseEnabled } from "./supabase";
 import type { NewListingDraft } from "../types/listing";
 
@@ -44,7 +44,12 @@ export async function requestListingPayment(draft: NewListingDraft): Promise<Inv
 
   return new Promise((resolve) => {
     try {
-      WebApp.openInvoice(invoiceLink, (status) => resolve(status));
+      const webApp = getWebApp();
+      if (!webApp) {
+        resolve("unavailable");
+        return;
+      }
+      webApp.openInvoice(invoiceLink, (status) => resolve(status));
     } catch {
       resolve("unavailable");
     }

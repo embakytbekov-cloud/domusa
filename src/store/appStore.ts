@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { CategoryKey, TabKey } from "../data/constants";
 import { PRICE_BANDS } from "../data/constants";
 import type { Listing, NewListingDraft, TelegramUser } from "../types/listing";
-import { getTelegramUser } from "../lib/telegram";
+import { getTelegramUser, waitForTelegramUser } from "../lib/telegram";
 import { listingsRepo } from "../lib/repo";
 import { linkTelegramProfile } from "../lib/auth";
 import { requestListingPayment } from "../lib/payments";
@@ -342,7 +342,15 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   initUser: () => {
-    set({ user: getTelegramUser() });
+    // waitForTelegramUser() резолвится сразу, если Telegram успел заполнить
+    // initDataUnsafe.user к этому моменту, и опрашивает ещё немного, если
+    // нет (гонка инициализации на некоторых клиентах — см.
+    // src/lib/telegram.ts). Когда данные появляются, стор реактивно
+    // обновляется: статус "Гость" и плашка "откройте в Telegram" сами
+    // уходят, как только user становится не-null.
+    waitForTelegramUser().then((user) => {
+      set({ user });
+    });
     requestNearestCity().then((city) => {
       if (city) set({ nearestCity: city });
     });

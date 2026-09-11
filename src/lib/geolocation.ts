@@ -1,4 +1,4 @@
-import WebApp from "@twa-dev/sdk";
+import { getWebApp } from "./telegram";
 import { nearestCity } from "../data/cityCoords";
 
 // Геолокация пользователя через нативный Telegram LocationManager (Bot API
@@ -20,7 +20,10 @@ export interface GeoResult {
 
 function getLocationViaTelegram(): Promise<GeoResult | null> {
   return new Promise((resolve) => {
-    const lm = WebApp.LocationManager;
+    // См. src/lib/telegram.ts: берём window.Telegram.WebApp напрямую через
+    // getWebApp(), а не дефолтный экспорт @twa-dev/sdk — в продакшен-сборке
+    // он не совпадает с реальным объектом.
+    const lm = getWebApp()?.LocationManager;
     if (!lm) {
       resolve(null);
       return;

@@ -28,6 +28,15 @@ const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const LISTING_PRICE_USD = 3;
 
+// См. комментарий в supabase/functions/telegram-link/index.ts — та же причина:
+// supabase.functions.invoke() из браузера триггерит CORS preflight (OPTIONS),
+// без явной обработки которого запрос блокируется браузером ещё до отправки.
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
 interface ListingDraft {
   title: string;
   city: string;
@@ -41,31 +50,35 @@ interface ListingDraft {
 }
 
 Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
+
   if (req.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
+    return new Response("Method not allowed", { status: 405, headers: corsHeaders });
   }
   if (!BOT_TOKEN || !PROVIDER_TOKEN) {
     // Бот/провайдер ещё не настроены через @BotFather — это ожидаемо, пока
     // пользователь не подключил Stripe. Отвечаем понятной ошибкой, а не 500.
     return new Response(JSON.stringify({ error: "payments_not_configured" }), {
       status: 503,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) {
-    return new Response("Missing Authorization header", { status: 401 });
+    return new Response("Missing Authorization header", { status: 401, headers: corsHeaders });
   }
 
   let draft: ListingDraft | undefined;
   try {
     ({ draft } = await req.json());
   } catch {
-    return new Response("Invalid JSON body", { status: 400 });
+    return new Response("Invalid JSON body", { status: 400, headers: corsHeaders });
   }
   if (!draft || !draft.title || !draft.price) {
-    return new Response("draft is required", { status: 400 });
+    return new Response("draft is required", { status: 400, headers: corsHeaders });
   }
 
   const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -73,7 +86,7 @@ Deno.serve(async (req) => {
   });
   const { data: userData, error: userError } = await userClient.auth.getUser();
   if (userError || !userData.user) {
-    return new Response("Invalid Supabase session", { status: 401 });
+    return new Response("Invalid Supabase session", { status: 401, headers: corsHeaders });
   }
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
@@ -91,7 +104,7 @@ Deno.serve(async (req) => {
     .single();
 
   if (insertError || !pending) {
-    return new Response(insertError?.message ?? "failed to create pending listing", { status: 500 });
+    return new Response(insertError?.message ?? "failed to create pending listing", { status: 500, headers: corsHeaders });
   }
 
   const invoiceRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/createInvoiceLink`, {
@@ -112,11 +125,11 @@ Deno.serve(async (req) => {
     await admin.from("pending_listings").delete().eq("id", pending.id);
     return new Response(JSON.stringify({ error: invoiceJson.description ?? "createInvoiceLink failed" }), {
       status: 502,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
   return new Response(JSON.stringify({ invoiceLink: invoiceJson.result }), {
-    headers: { "Content-Type": "application/json" },
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });

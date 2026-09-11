@@ -28,6 +28,19 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+// Клиент (src/lib/auth.ts) вызывает эту функцию через supabase.functions.invoke(),
+// который отправляет заголовки Authorization/apikey/x-client-info/content-type —
+// это триггерит CORS preflight (OPTIONS) из браузера. Без явной обработки OPTIONS
+// и заголовков Access-Control-* браузер блокирует запрос ещё ДО того, как он
+// доходит до основной логики — именно поэтому кнопка подтверждения в приложении
+// молча (или с ошибкой) обрывалась: сервер отвечал на preflight 405, а не 204,
+// и настоящий POST с initData никогда не уходил.
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
 async function hmacSha256(key: BufferSource, message: string): Promise<Uint8Array> {
   const cryptoKey = await crypto.subtle.importKey("raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const sig = await crypto.subtle.sign("HMAC", cryptoKey, new TextEncoder().encode(message));
@@ -63,33 +76,37 @@ async function verifyInitData(initData: string): Promise<Record<string, string> 
 }
 
 Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
+
   if (req.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
+    return new Response("Method not allowed", { status: 405, headers: corsHeaders });
   }
 
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) {
-    return new Response("Missing Authorization header", { status: 401 });
+    return new Response("Missing Authorization header", { status: 401, headers: corsHeaders });
   }
 
   let initData: string | undefined;
   try {
     ({ initData } = await req.json());
   } catch {
-    return new Response("Invalid JSON body", { status: 400 });
+    return new Response("Invalid JSON body", { status: 400, headers: corsHeaders });
   }
   if (!initData) {
-    return new Response("initData is required", { status: 400 });
+    return new Response("initData is required", { status: 400, headers: corsHeaders });
   }
 
   const verified = await verifyInitData(initData);
   if (!verified) {
-    return new Response("Invalid Telegram signature", { status: 401 });
+    return new Response("Invalid Telegram signature", { status: 401, headers: corsHeaders });
   }
 
   const tgUser = verified.user ? JSON.parse(verified.user) : null;
   if (!tgUser) {
-    return new Response("initData has no user payload", { status: 400 });
+    return new Response("initData has no user payload", { status: 400, headers: corsHeaders });
   }
 
   // Клиент от имени вызывающего — чтобы достоверно узнать его auth.uid()
@@ -98,7 +115,7 @@ Deno.serve(async (req) => {
   });
   const { data: userData, error: userError } = await userClient.auth.getUser();
   if (userError || !userData.user) {
-    return new Response("Invalid Supabase session", { status: 401 });
+    return new Response("Invalid Supabase session", { status: 401, headers: corsHeaders });
   }
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
@@ -111,10 +128,10 @@ Deno.serve(async (req) => {
   });
 
   if (error) {
-    return new Response(error.message, { status: 500 });
+    return new Response(error.message, { status: 500, headers: corsHeaders });
   }
 
   return new Response(JSON.stringify({ ok: true }), {
-    headers: { "Content-Type": "application/json" },
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });

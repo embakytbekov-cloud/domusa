@@ -4,6 +4,7 @@ import { PRICE_BANDS } from "../data/constants";
 import type { NewListingDraft, TelegramUser } from "../types/listing";
 import { getTelegramUser } from "../lib/telegram";
 import { listingsRepo } from "../lib/repo";
+import { t } from "../i18n";
 
 export type Screen = "feed" | "detail";
 
@@ -18,12 +19,12 @@ const emptyForm: NewListingDraft = {
   title: "",
   city: "Лос-Анджелес",
   district: "",
-  term: "Долгосрочно",
+  term: "month",
   price: "",
-  deposit: "Есть",
+  deposit: true,
   desc: "",
   photos: 0,
-  amenities: ["Wi-Fi"],
+  amenities: ["wifi"],
 };
 
 interface AppState {
@@ -39,6 +40,8 @@ interface AppState {
   filtersOpen: boolean;
   cityFilter: string[];
   bandFilter: number[];
+
+  languageSheetOpen: boolean;
 
   user: TelegramUser;
   registered: boolean;
@@ -59,6 +62,10 @@ interface AppState {
   toggleCity: (city: string) => void;
   toggleBand: (index: number) => void;
   resetFilters: () => void;
+
+  // выбор языка интерфейса (Профиль → Язык)
+  openLanguageSheet: () => void;
+  closeLanguageSheet: () => void;
 
   // объявления
   toggleSaved: (id: string) => void;
@@ -100,6 +107,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   cityFilter: [],
   bandFilter: [],
 
+  languageSheetOpen: false,
+
   user: getTelegramUser(),
   registered: false,
   pending: null,
@@ -111,9 +120,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (tab === "add" && !get().registered) {
       get().gate(
         () => set({ tab: "add", screen: "feed" }),
-        "Представьтесь, пожалуйста",
-        "Чтобы опубликовать жильё за $3, подтвердим ваш профиль Telegram. Анкету заполнять не нужно.",
-        "Продолжить как " + get().user.first
+        t("gate.addTabTitle"),
+        t("gate.addTabSub"),
+        t("gate.continueAs", { name: get().user.first })
       );
       return;
     }
@@ -136,6 +145,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
   resetFilters: () => set({ cityFilter: [], bandFilter: [], category: "all" }),
 
+  openLanguageSheet: () => set({ languageSheetOpen: true }),
+  closeLanguageSheet: () => set({ languageSheetOpen: false }),
+
   toggleSaved: (id) => {
     const doToggle = () =>
       set((s) => ({
@@ -143,9 +155,9 @@ export const useAppStore = create<AppState>((set, get) => ({
       }));
     get().gate(
       doToggle,
-      "Сохранить в избранное",
-      "Подключим ваш профиль Telegram — список сохранится на всех устройствах.",
-      "Продолжить как " + get().user.first
+      t("gate.saveTitle"),
+      t("gate.saveSub"),
+      t("gate.continueAs", { name: get().user.first })
     );
   },
 
@@ -157,11 +169,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     get().gate(
       () => {
         set({ booked: true });
-        get().flash("Запрос отправлен хозяину — ответ обычно в течение часа");
+        get().flash(t("toast.bookRequested"));
       },
-      "Написать хозяину",
-      "Хозяин увидит ваше имя из Telegram — так заявкам доверяют больше.",
-      "Продолжить как " + get().user.first
+      t("gate.bookTitle"),
+      t("gate.bookSub"),
+      t("gate.continueAs", { name: get().user.first })
     );
   },
 
@@ -175,7 +187,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   confirmGate: () => {
     const pending = get().pending;
     set({ registered: true, pending: null });
-    get().flash("Профиль подтверждён через Telegram");
+    get().flash(t("toast.profileConfirmed"));
     pending?.action();
   },
   closeGate: () => set({ pending: null }),
@@ -202,7 +214,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   publish: async () => {
     const { form } = get();
     if (!form.title || !form.price) {
-      get().flash("Заполните заголовок и цену");
+      get().flash(t("toast.fillRequired"));
       return;
     }
     get().gate(
@@ -210,15 +222,15 @@ export const useAppStore = create<AppState>((set, get) => ({
         set({ publishing: true });
         try {
           await listingsRepo.publish(form);
-          get().flash("Объявление опубликовано — оно уже в ленте");
+          get().flash(t("toast.published"));
           set({ tab: "search", form: emptyForm });
         } finally {
           set({ publishing: false });
         }
       },
-      "Представьтесь, пожалуйста",
-      "Чтобы опубликовать жильё, подтвердим профиль. Первое объявление бесплатно, каждое следующее — $3.",
-      "Продолжить как " + get().user.first
+      t("gate.addPublishTitle"),
+      t("gate.addPublishSub"),
+      t("gate.continueAs", { name: get().user.first })
     );
   },
 

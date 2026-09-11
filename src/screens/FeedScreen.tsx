@@ -4,6 +4,7 @@ import { useAppStore } from "../store/appStore";
 import { ListingCard } from "../components/ListingCard";
 import { passFilters } from "../lib/filters";
 import { ShapeIcon } from "../components/ShapeIcon";
+import { useT } from "../i18n";
 
 export function FeedScreen() {
   const category = useAppStore((s) => s.category);
@@ -11,6 +12,7 @@ export function FeedScreen() {
   const cityFilter = useAppStore((s) => s.cityFilter);
   const bandFilter = useAppStore((s) => s.bandFilter);
   const openFilters = useAppStore((s) => s.openFilters);
+  const t = useT();
 
   const rails = CITY_RAILS.map((r) => ({
     ...r,
@@ -18,8 +20,8 @@ export function FeedScreen() {
   })).filter((r) => r.items.length > 0);
 
   const total = rails.reduce((sum, r) => sum + r.items.length, 0);
-  const searchTitle = cityFilter.length ? cityFilter.join(", ") : "Куда едем?";
-  const searchSub = `${total} вариантов · посуточно и долгосрочно`;
+  const searchTitle = cityFilter.length ? cityFilter.join(", ") : t("feed.searchPlaceholder");
+  const searchSub = t("feed.resultsCount", { count: total });
 
   return (
     <div style={{ animation: "fadeIn .25s ease", paddingBottom: 96 }}>
@@ -32,7 +34,7 @@ export function FeedScreen() {
             Дом<span style={{ color: "var(--accent)" }}>USA</span>
           </div>
         </div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-45)", letterSpacing: ".2px" }}>Жильё для своих в США</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-45)", letterSpacing: ".2px" }}>{t("feed.tagline")}</div>
       </div>
 
       <div style={{ position: "sticky", top: 0, zIndex: 5, background: "var(--surface)", padding: "2px 18px 0" }}>
@@ -77,7 +79,7 @@ export function FeedScreen() {
                 style={{ flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 7, cursor: "pointer", paddingBottom: 9, borderBottom: `2px solid ${on ? "var(--ink)" : "transparent"}`, opacity: on ? 1 : 0.5 }}
               >
                 <ShapeIcon size={24} w={c.w} h={c.h} radius={c.radius} rotate={c.rot} color="var(--ink)" />
-                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap" }}>{c.label}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)", whiteSpace: "nowrap" }}>{t(`category.${c.k}`)}</div>
               </button>
             );
           })}
@@ -91,7 +93,7 @@ export function FeedScreen() {
               <div style={{ fontSize: 17, fontWeight: 800, color: "var(--ink)", letterSpacing: "-.4px" }}>{r.title}</div>
               <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-50)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.sub}</div>
             </div>
-            <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", textDecoration: "underline", flex: "none", cursor: "pointer" }}>Все</div>
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", textDecoration: "underline", flex: "none", cursor: "pointer" }}>{t("feed.viewAll")}</div>
           </div>
           <div
             style={{
@@ -116,8 +118,8 @@ export function FeedScreen() {
       {rails.length === 0 && (
         <div style={{ padding: "80px 40px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
           <div style={{ width: 52, height: 52, borderRadius: 26, border: "2px dashed var(--ink-25)" }} />
-          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>Ничего не найдено</div>
-          <div style={{ fontSize: 13, color: "var(--ink-50)", fontWeight: 500 }}>Попробуйте снять фильтры</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>{t("feed.emptyTitle")}</div>
+          <div style={{ fontSize: 13, color: "var(--ink-50)", fontWeight: 500 }}>{t("feed.emptySub")}</div>
         </div>
       )}
     </div>

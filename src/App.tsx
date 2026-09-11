@@ -12,12 +12,15 @@ import { DetailBookingBar } from "./components/DetailBookingBar";
 import { AddPublishBar } from "./components/AddPublishBar";
 import { FiltersSheet } from "./components/FiltersSheet";
 import { GateSheet } from "./components/GateSheet";
+import { LanguageSheet } from "./components/LanguageSheet";
 import { Toast } from "./components/Toast";
+import { useT } from "./i18n";
 
 export default function App() {
   const screen = useAppStore((s) => s.screen);
   const tab = useAppStore((s) => s.tab);
   const initUser = useAppStore((s) => s.initUser);
+  const t = useT();
 
   useEffect(() => {
     initTelegram();
@@ -55,7 +58,7 @@ export default function App() {
         paddingTop: "var(--app-safe-top)",
       }}
     >
-      {isDetail && <TopBar title="Объявление" />}
+      {isDetail && <TopBar title={t("detail.headerTitle")} />}
 
       <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", position: "relative" }}>{body}</div>
 
@@ -66,6 +69,7 @@ export default function App() {
 
       <FiltersSheet />
       <GateSheet />
+      <LanguageSheet />
       <Toast />
     </div>
   );

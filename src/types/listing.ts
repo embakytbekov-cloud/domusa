@@ -47,9 +47,9 @@ export type NewListingDraft = {
   title: string;
   city: string;
   district: string;
-  term: "Посуточно" | "Долгосрочно";
+  term: RentTerm;
   price: string;
-  deposit: "Есть" | "Нет";
+  deposit: boolean;
   desc: string;
   photos: number;
   amenities: string[];

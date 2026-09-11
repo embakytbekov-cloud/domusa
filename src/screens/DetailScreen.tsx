@@ -1,14 +1,16 @@
 import { useAppStore } from "../store/appStore";
 import { useCurrentListing } from "../lib/useCurrentListing";
+import { useT } from "../i18n";
 
 export function DetailScreen() {
   const photoIndex = useAppStore((s) => s.photoIndex);
   const nextPhoto = useAppStore((s) => s.nextPhoto);
   const prevPhoto = useAppStore((s) => s.prevPhoto);
   const listing = useCurrentListing();
+  const t = useT();
 
   if (!listing) {
-    return <div style={{ padding: 40, textAlign: "center", color: "var(--ink-50)", fontSize: 13 }}>Загрузка…</div>;
+    return <div style={{ padding: 40, textAlign: "center", color: "var(--ink-50)", fontSize: 13 }}>{t("detail.loading")}</div>;
   }
 
   const n = listing.photos.length;
@@ -53,7 +55,7 @@ export function DetailScreen() {
           {listing.district}, {listing.city} · {listing.type}
         </div>
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink)", marginTop: 2 }}>
-          ★ {listing.rating} <span style={{ color: "var(--ink-45)", fontWeight: 500 }}>· {listing.reviews} отзыва</span>
+          ★ {listing.rating} <span style={{ color: "var(--ink-45)", fontWeight: 500 }}>· {t("detail.reviewsSuffix", { count: listing.reviews })}</span>
         </div>
       </div>
 
@@ -64,8 +66,8 @@ export function DetailScreen() {
           {hostInitials}
         </div>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>Хозяин — {listing.host}</div>
-          <div style={{ fontSize: 12.5, color: "var(--ink-50)", fontWeight: 500 }}>Сдаёт с {listing.hostSince} · отвечает за ~1 час</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>{t("detail.hostPrefix", { host: listing.host })}</div>
+          <div style={{ fontSize: 12.5, color: "var(--ink-50)", fontWeight: 500 }}>{t("detail.hostSince", { year: listing.hostSince })}</div>
         </div>
       </div>
 
@@ -75,7 +77,7 @@ export function DetailScreen() {
 
       {listing.amenities.length > 0 && (
         <div style={{ padding: "22px 20px 0" }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)", marginBottom: 12 }}>Что есть в комнате</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)", marginBottom: 12 }}>{t("detail.amenitiesTitle")}</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 10px" }}>
             {listing.amenities.map((a) => (
               <div key={a} style={{ display: "flex", alignItems: "center", gap: 9 }}>
@@ -89,7 +91,7 @@ export function DetailScreen() {
 
       {listing.rules.length > 0 && (
         <div style={{ padding: "22px 20px 0" }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)", marginBottom: 12 }}>Правила дома</div>
+          <div style={{ fontSize: 15, fontWeight: 800, color: "var(--ink)", marginBottom: 12 }}>{t("detail.rulesTitle")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
             {listing.rules.map((r) => (
               <div key={r.text} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 14px", borderRadius: 14, background: "var(--ink-04)" }}>
@@ -115,7 +117,7 @@ export function DetailScreen() {
         >
           <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 60, height: 60, borderRadius: 30, background: "rgba(47,111,94,.14)" }} />
           <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 16, height: 16, borderRadius: 8, background: "var(--accent)", border: "3px solid var(--surface)" }} />
-          <div style={{ position: "absolute", left: 14, bottom: 12, fontSize: 11.5, fontWeight: 700, color: "var(--ink-55)" }}>Точный адрес — после брони</div>
+          <div style={{ position: "absolute", left: 14, bottom: 12, fontSize: 11.5, fontWeight: 700, color: "var(--ink-55)" }}>{t("detail.exactAddress")}</div>
         </div>
       </div>
     </div>

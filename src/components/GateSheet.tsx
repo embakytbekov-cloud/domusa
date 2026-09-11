@@ -1,10 +1,12 @@
 import { useAppStore } from "../store/appStore";
+import { useT } from "../i18n";
 
 export function GateSheet() {
   const pending = useAppStore((s) => s.pending);
   const closeGate = useAppStore((s) => s.closeGate);
   const confirmGate = useAppStore((s) => s.confirmGate);
   const user = useAppStore((s) => s.user);
+  const t = useT();
 
   if (!pending) return null;
 
@@ -62,7 +64,7 @@ export function GateSheet() {
           onClick={closeGate}
           style={{ marginTop: 10, height: 46, width: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13.5, fontWeight: 700, color: "var(--ink-50)" }}
         >
-          Не сейчас
+          {t("gate.dismiss")}
         </button>
       </div>
     </>

@@ -1,8 +1,10 @@
 import { useAppStore } from "../store/appStore";
+import { useT } from "../i18n";
 
 export function AddPublishBar() {
   const publish = useAppStore((s) => s.publish);
   const publishing = useAppStore((s) => s.publishing);
+  const t = useT();
 
   return (
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 76, padding: "12px 20px 14px", background: "rgba(253,252,250,.96)", backdropFilter: "blur(12px)", borderTop: "1px solid var(--ink-09)", zIndex: 10 }}>
@@ -24,7 +26,7 @@ export function AddPublishBar() {
           opacity: publishing ? 0.6 : 1,
         }}
       >
-        {publishing ? "Публикуем…" : "Опубликовать бесплатно"}
+        {publishing ? t("add.publishing") : t("add.publish")}
       </button>
     </div>
   );

@@ -1,5 +1,6 @@
 import type { Listing } from "../types/listing";
 import { useAppStore } from "../store/appStore";
+import { useT } from "../i18n";
 
 interface ListingCardProps {
   listing: Listing;
@@ -9,9 +10,10 @@ export function ListingCard({ listing }: ListingCardProps) {
   const openDetail = useAppStore((s) => s.openDetail);
   const saved = useAppStore((s) => s.saved.includes(listing.id));
   const toggleSaved = useAppStore((s) => s.toggleSaved);
+  const t = useT();
 
-  const unit = listing.term === "day" ? "/ сутки" : "/ месяц";
-  const badge = listing.term === "day" ? "Посуточно" : "Долгосрочно";
+  const unit = listing.term === "day" ? t("listing.perDay") : t("listing.perMonth");
+  const badge = listing.term === "day" ? t("listing.badgeDay") : t("listing.badgeMonth");
 
   return (
     <div

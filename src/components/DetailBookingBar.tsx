@@ -1,15 +1,17 @@
 import { useAppStore } from "../store/appStore";
 import { useCurrentListing } from "../lib/useCurrentListing";
+import { useT } from "../i18n";
 
 export function DetailBookingBar() {
   const booked = useAppStore((s) => s.booked);
   const book = useAppStore((s) => s.book);
   const listing = useCurrentListing();
+  const t = useT();
 
   if (!listing) return null;
 
-  const unit = listing.term === "day" ? "/ сутки" : "/ месяц";
-  const availability = listing.term === "day" ? "Свободно на этой неделе" : "Свободна с 1 октября";
+  const unit = listing.term === "day" ? t("listing.perDay") : t("listing.perMonth");
+  const availability = listing.term === "day" ? t("booking.availableWeek") : t("booking.availableFrom");
 
   return (
     <div
@@ -35,7 +37,7 @@ export function DetailBookingBar() {
         <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-50)" }}>{availability}</div>
       </div>
       <button type="button" onClick={book} className="pill-btn" style={{ flex: "none", padding: "0 26px" }}>
-        {booked ? "Заявка отправлена" : "Забронировать"}
+        {booked ? t("booking.requested") : t("booking.book")}
       </button>
     </div>
   );

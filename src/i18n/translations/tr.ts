@@ -110,6 +110,7 @@ export const tr = {
     addPublishTitle: "Lütfen kendinizi tanıtın",
     addPublishSub: "Konutu yayınlamak için profilinizi onaylayalım. İlk ilan ücretsiz, sonraki her ilan — $3.",
     requiresTelegram: "Devam etmek için uygulamayı Telegram'da açın",
+    connecting: "Bağlanıyor…",
   },
   toast: {
     bookRequested: "Talep ev sahibine gönderildi — genellikle bir saat içinde yanıt verir",

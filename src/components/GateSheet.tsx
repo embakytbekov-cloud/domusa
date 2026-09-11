@@ -6,6 +6,7 @@ export function GateSheet() {
   const closeGate = useAppStore((s) => s.closeGate);
   const confirmGate = useAppStore((s) => s.confirmGate);
   const user = useAppStore((s) => s.user);
+  const gateLoading = useAppStore((s) => s.gateLoading);
   const t = useT();
 
   // gate() в appStore не открывает эту модалку без настоящего Telegram-
@@ -59,13 +60,21 @@ export function GateSheet() {
           </div>
         </div>
         <div style={{ fontSize: 13.5, fontWeight: 500, lineHeight: 1.55, color: "var(--ink-70)", marginBottom: 18 }}>{pending.sub}</div>
-        <button type="button" className="pill-btn" onClick={confirmGate} style={{ width: "100%" }}>
-          {pending.cta}
+        <button
+          type="button"
+          className="pill-btn"
+          onClick={confirmGate}
+          disabled={gateLoading}
+          style={{ width: "100%", gap: 9 }}
+        >
+          {gateLoading && <span className="spinner" aria-hidden="true" />}
+          {gateLoading ? t("gate.connecting") : pending.cta}
         </button>
         <button
           type="button"
           onClick={closeGate}
-          style={{ marginTop: 10, height: 46, width: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13.5, fontWeight: 700, color: "var(--ink-50)" }}
+          disabled={gateLoading}
+          style={{ marginTop: 10, height: 46, width: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13.5, fontWeight: 700, color: "var(--ink-50)", opacity: gateLoading ? 0.5 : 1, cursor: gateLoading ? "not-allowed" : "pointer" }}
         >
           {t("gate.dismiss")}
         </button>

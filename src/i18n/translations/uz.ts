@@ -110,6 +110,7 @@ export const uz = {
     addPublishTitle: "Iltimos, o'zingizni tanishtiring",
     addPublishSub: "Uy-joyni e'lon qilish uchun profilni tasdiqlaymiz. Birinchi e'lon bepul, keyingisi — $3.",
     requiresTelegram: "Davom etish uchun ilovani Telegram orqali oching",
+    connecting: "Ulanmoqda…",
   },
   toast: {
     bookRequested: "So'rov egasiga yuborildi — odatda bir soat ichida javob beradi",

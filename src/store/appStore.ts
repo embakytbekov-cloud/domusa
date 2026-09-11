@@ -54,6 +54,7 @@ interface AppState {
   user: TelegramUser | null;
   registered: boolean;
   pending: GateRequest | null;
+  gateLoading: boolean;
 
   form: NewListingDraft;
   publishing: boolean;
@@ -132,6 +133,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   user: getTelegramUser(),
   registered: false,
   pending: null,
+  gateLoading: false,
 
   form: emptyForm,
   publishing: false,
@@ -223,6 +225,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ pending: { action, title, sub, cta } });
   },
   confirmGate: async () => {
+    // Защита от повторного клика, пока запрос уже в полёте.
+    if (get().gateLoading) return;
+
     const pending = get().pending;
     // Настоящая Supabase-сессия (анонимный вход + привязка Telegram-
     // профиля через Edge Function telegram-link, проверяющую подлинность
@@ -233,11 +238,28 @@ export const useAppStore = create<AppState>((set, get) => ({
     // подключён, а привязка не удалась (например, секрет бота ещё не
     // настроен в Supabase) — не притворяемся, что пользователь
     // подтверждён, иначе дальше словим "Нет активной сессии Supabase".
+    //
+    // gateLoading включает spinner на кнопке "Continue as..." (см.
+    // GateSheet.tsx) — раньше при медленном/зависшем запросе к Supabase
+    // клик выглядел так, будто ничего не произошло. linkTelegramProfile()
+    // сама никогда не бросает исключение и не виснет дольше 10с (см.
+    // src/lib/auth.ts), но на всякий случай дополнительно страхуемся
+    // try/catch/finally здесь же.
     if (supabaseEnabled) {
-      const linked = await linkTelegramProfile();
-      if (!linked) {
+      set({ gateLoading: true });
+      try {
+        const linked = await linkTelegramProfile();
+        if (!linked) {
+          console.error("[appStore] confirmGate: linkTelegramProfile() вернула false");
+          get().flash(t("toast.linkFailed"));
+          return;
+        }
+      } catch (err) {
+        console.error("[appStore] confirmGate: неожиданная ошибка при привязке профиля", err);
         get().flash(t("toast.linkFailed"));
         return;
+      } finally {
+        set({ gateLoading: false });
       }
     }
     set({ registered: true, pending: null });

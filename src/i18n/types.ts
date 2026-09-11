@@ -127,6 +127,7 @@ export interface Dict {
     addPublishTitle: string;
     addPublishSub: string;
     requiresTelegram: string;
+    connecting: string;
   };
   toast: {
     bookRequested: string;

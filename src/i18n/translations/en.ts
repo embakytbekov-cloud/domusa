@@ -110,6 +110,7 @@ export const en = {
     addPublishTitle: "Please introduce yourself",
     addPublishSub: "To publish a listing, let's verify your profile. Your first listing is free, each next one — $3.",
     requiresTelegram: "Open this app in Telegram to continue",
+    connecting: "Connecting…",
   },
   toast: {
     bookRequested: "Request sent to the host — they usually reply within an hour",

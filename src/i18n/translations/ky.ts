@@ -72,7 +72,13 @@ export const ky = {
     photosHint: "Кеминде 3 сүрөт. Биринчиси мукаба болот.",
     fieldAmenities: "Ыңгайлуулуктар",
     publish: "Акысыз жарыялоо",
+    publishPay: "$3 үчүн жарыялоо",
     publishing: "Жарыяланууда…",
+    opening: "Төлөмдү ачып жатабыз…",
+    newListing: "+ Жарнак кошуу",
+    emptyListingsTitle: "Сизде азырынча жарнак жок",
+    emptyListingsSub: "Биринчисин жайгаштырыңыз — ал акысыз",
+    backToList: "Менин жарнактарыма",
   },
   profile: {
     title: "Профиль",
@@ -107,6 +113,7 @@ export const ky = {
     profileConfirmed: "Профиль Telegram аркылуу ырасталды",
     fillRequired: "Аталышын жана баасын толтуруңуз",
     published: "Жарнак жарыяланды — ал азыр лентада",
+    publishError: "Жарыялоо мүмкүн болбоду. Байланышты текшерип, кайра аракет кылыңыз.",
   },
   amenity: {
     wifi: "Wi-Fi",
@@ -118,4 +125,16 @@ export const ky = {
     pets: "Үй жаныбарларына болот",
   },
   languagePicker: { title: "Тил" },
+  publishSuccess: {
+    title: "Жарнак жарыяланды!",
+    sub: "Ал «Менин жарнактарым» бөлүмүндө көрүнүп турат.",
+    cta: "Менин жарнактарыма",
+  },
+  payment: {
+    cancelled: "Төлөм жокко чыгарылды",
+    failed: "Төлөм өтпөй калды — кайра аракет кылыңыз",
+    processing: "Төлөм өттү — жарнакты жарыялап жатабыз…",
+    unavailable: "Төлөм азыр жеткиликсиз",
+  },
+  geo: { nearYou: "Сизге жакын: {city}" },
 } satisfies Dict;

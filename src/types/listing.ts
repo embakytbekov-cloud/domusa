@@ -51,6 +51,6 @@ export type NewListingDraft = {
   price: string;
   deposit: boolean;
   desc: string;
-  photos: number;
+  photos: string[]; // публичные URL уже загруженных в Supabase Storage фото
   amenities: string[];
 };

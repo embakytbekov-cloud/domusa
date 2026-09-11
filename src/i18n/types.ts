@@ -90,7 +90,13 @@ export interface Dict {
     photosHint: string;
     fieldAmenities: string;
     publish: string;
+    publishPay: string;
     publishing: string;
+    opening: string;
+    newListing: string;
+    emptyListingsTitle: string;
+    emptyListingsSub: string;
+    backToList: string;
   };
   profile: {
     title: string;
@@ -124,6 +130,7 @@ export interface Dict {
     profileConfirmed: string;
     fillRequired: string;
     published: string;
+    publishError: string;
   };
   amenity: {
     wifi: string;
@@ -136,6 +143,20 @@ export interface Dict {
   };
   languagePicker: {
     title: string;
+  };
+  publishSuccess: {
+    title: string;
+    sub: string;
+    cta: string;
+  };
+  payment: {
+    cancelled: string;
+    failed: string;
+    processing: string;
+    unavailable: string;
+  };
+  geo: {
+    nearYou: string; // {city}
   };
 }
 

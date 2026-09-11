@@ -72,7 +72,13 @@ export const tr = {
     photosHint: "En az 3 fotoğraf. İlki kapak olacak.",
     fieldAmenities: "Olanaklar",
     publish: "Ücretsiz yayınla",
+    publishPay: "$3 karşılığında yayınla",
     publishing: "Yayınlanıyor…",
+    opening: "Ödeme açılıyor…",
+    newListing: "+ İlan ekle",
+    emptyListingsTitle: "Henüz ilanınız yok",
+    emptyListingsSub: "İlkini yayınlayın — ücretsiz",
+    backToList: "İlanlarıma dön",
   },
   profile: {
     title: "Profil",
@@ -107,6 +113,7 @@ export const tr = {
     profileConfirmed: "Profil Telegram üzerinden onaylandı",
     fillRequired: "Başlığı ve fiyatı doldurun",
     published: "İlan yayınlandı — akışta zaten görünüyor",
+    publishError: "Yayınlanamadı. Bağlantınızı kontrol edip tekrar deneyin.",
   },
   amenity: {
     wifi: "Wi-Fi",
@@ -118,4 +125,16 @@ export const tr = {
     pets: "Evcil hayvana izin var",
   },
   languagePicker: { title: "Dil" },
+  publishSuccess: {
+    title: "İlan yayınlandı!",
+    sub: "Artık \"İlanlarım\" bölümünde görünüyor.",
+    cta: "İlanlarıma dön",
+  },
+  payment: {
+    cancelled: "Ödeme iptal edildi",
+    failed: "Ödeme başarısız oldu — tekrar deneyin",
+    processing: "Ödeme alındı — ilan yayınlanıyor…",
+    unavailable: "Ödeme şu anda kullanılamıyor",
+  },
+  geo: { nearYou: "Size yakın: {city}" },
 } satisfies Dict;

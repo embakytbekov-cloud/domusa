@@ -1,12 +1,17 @@
 import { create } from "zustand";
 import type { CategoryKey, TabKey } from "../data/constants";
 import { PRICE_BANDS } from "../data/constants";
-import type { NewListingDraft, TelegramUser } from "../types/listing";
+import type { Listing, NewListingDraft, TelegramUser } from "../types/listing";
 import { getTelegramUser } from "../lib/telegram";
 import { listingsRepo } from "../lib/repo";
+import { linkTelegramProfile } from "../lib/auth";
+import { requestListingPayment } from "../lib/payments";
+import { requestNearestCity } from "../lib/geolocation";
+import { supabaseEnabled } from "../lib/supabase";
 import { t } from "../i18n";
 
 export type Screen = "feed" | "detail";
+export type AddView = "list" | "form";
 
 interface GateRequest {
   action: () => void;
@@ -23,7 +28,7 @@ const emptyForm: NewListingDraft = {
   price: "",
   deposit: true,
   desc: "",
-  photos: 0,
+  photos: [],
   amenities: ["wifi"],
 };
 
@@ -43,12 +48,21 @@ interface AppState {
 
   languageSheetOpen: boolean;
 
+  // геолокация — ближайший к пользователю город (см. src/lib/geolocation.ts)
+  nearestCity: string | null;
+
   user: TelegramUser;
   registered: boolean;
   pending: GateRequest | null;
 
   form: NewListingDraft;
   publishing: boolean;
+  paying: boolean;
+  publishSuccessOpen: boolean;
+
+  addView: AddView;
+  myListings: Listing[];
+  myListingsLoading: boolean;
 
   // навигация
   setTab: (tab: TabKey) => void;
@@ -81,11 +95,15 @@ interface AppState {
   // уведомления
   flash: (message: string) => void;
 
-  // форма размещения объявления
+  // форма размещения объявления / "Мои объявления"
   setFormField: <K extends keyof NewListingDraft>(key: K, value: NewListingDraft[K]) => void;
   toggleFormAmenity: (amenity: string) => void;
-  setFormPhotoSlot: (index: number) => void;
+  addFormPhoto: (url: string) => void;
+  removeFormPhoto: (url: string) => void;
   publish: () => Promise<void>;
+  setAddView: (view: AddView) => void;
+  fetchMyListings: () => Promise<void>;
+  closePublishSuccess: () => void;
 
   // инициализация
   initUser: () => void;
@@ -109,23 +127,35 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   languageSheetOpen: false,
 
+  nearestCity: null,
+
   user: getTelegramUser(),
   registered: false,
   pending: null,
 
   form: emptyForm,
   publishing: false,
+  paying: false,
+  publishSuccessOpen: false,
+
+  addView: "list",
+  myListings: [],
+  myListingsLoading: false,
 
   setTab: (tab) => {
     if (tab === "add" && !get().registered) {
       get().gate(
-        () => set({ tab: "add", screen: "feed" }),
+        () => {
+          set({ tab: "add", screen: "feed" });
+          get().fetchMyListings();
+        },
         t("gate.addTabTitle"),
         t("gate.addTabSub"),
         t("gate.continueAs", { name: get().user.first })
       );
       return;
     }
+    if (tab === "add") get().fetchMyListings();
     set({ tab, screen: "feed" });
   },
 
@@ -184,8 +214,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
     set({ pending: { action, title, sub, cta } });
   },
-  confirmGate: () => {
+  confirmGate: async () => {
     const pending = get().pending;
+    // Настоящая Supabase-сессия (анонимный вход + привязка Telegram-
+    // профиля через Edge Function telegram-link) нужна до того, как
+    // пользователь попадёт на экраны, которые пишут в Supabase напрямую —
+    // загрузка фото и публикация объявления. Без .env (supabaseEnabled
+    // = false) функция ничего не делает и приложение остаётся на моках.
+    if (supabaseEnabled) {
+      await linkTelegramProfile();
+    }
     set({ registered: true, pending: null });
     get().flash(t("toast.profileConfirmed"));
     pending?.action();
@@ -208,8 +246,23 @@ export const useAppStore = create<AppState>((set, get) => ({
           : [...s.form.amenities, amenity],
       },
     })),
-  setFormPhotoSlot: (index) =>
-    set((s) => ({ form: { ...s.form, photos: s.form.photos > index ? index : index + 1 } })),
+  addFormPhoto: (url) => set((s) => ({ form: { ...s.form, photos: [...s.form.photos, url] } })),
+  removeFormPhoto: (url) =>
+    set((s) => ({ form: { ...s.form, photos: s.form.photos.filter((p) => p !== url) } })),
+
+  setAddView: (addView) => set({ addView }),
+
+  fetchMyListings: async () => {
+    set({ myListingsLoading: true });
+    try {
+      const mine = await listingsRepo.getMyListings();
+      set({ myListings: mine, addView: mine.length > 0 ? "list" : "form" });
+    } finally {
+      set({ myListingsLoading: false });
+    }
+  },
+
+  closePublishSuccess: () => set({ publishSuccessOpen: false }),
 
   publish: async () => {
     const { form } = get();
@@ -221,11 +274,49 @@ export const useAppStore = create<AppState>((set, get) => ({
       async () => {
         set({ publishing: true });
         try {
-          await listingsRepo.publish(form);
-          get().flash(t("toast.published"));
-          set({ tab: "search", form: emptyForm });
+          const mineBefore = get().myListings.length || (await listingsRepo.getMyListings()).length;
+
+          if (mineBefore === 0) {
+            // Первое объявление — бесплатно, публикуем сразу.
+            const created = await listingsRepo.publish(form);
+            set((s) => ({ myListings: [created, ...s.myListings] }));
+            get().flash(t("toast.published"));
+            set({ form: emptyForm, addView: "list", publishSuccessOpen: true });
+            return;
+          }
+
+          // Второе и последующие — через Telegram Payments (Apple Pay /
+          // Google Pay включаются автоматически на стороне Telegram, если
+          // бот подключён к Stripe — см. src/lib/payments.ts).
+          set({ paying: true });
+          const outcome = await requestListingPayment(form);
+          set({ paying: false });
+
+          if (outcome === "paid") {
+            get().flash(t("payment.processing"));
+            const created = await listingsRepo.waitForNewListing(mineBefore);
+            if (created) {
+              set((s) => ({ myListings: [created, ...s.myListings] }));
+            } else {
+              await get().fetchMyListings();
+            }
+            set({ form: emptyForm, addView: "list", publishSuccessOpen: true });
+          } else if (outcome === "cancelled") {
+            get().flash(t("payment.cancelled"));
+          } else if (outcome === "unavailable") {
+            get().flash(t("payment.unavailable"));
+          } else {
+            get().flash(t("payment.failed"));
+          }
+        } catch (err) {
+          // Реальный бэкенд может упасть (нет сети, истекла сессия Supabase,
+          // отклонена RLS-политика и т.д.) — раньше такая ошибка тихо
+          // улетала в необработанный promise rejection и пользователь не
+          // понимал, почему публикация просто не произошла.
+          console.error("publish failed", err);
+          get().flash(t("toast.publishError"));
         } finally {
-          set({ publishing: false });
+          set({ publishing: false, paying: false });
         }
       },
       t("gate.addPublishTitle"),
@@ -234,7 +325,12 @@ export const useAppStore = create<AppState>((set, get) => ({
     );
   },
 
-  initUser: () => set({ user: getTelegramUser() }),
+  initUser: () => {
+    set({ user: getTelegramUser() });
+    requestNearestCity().then((city) => {
+      if (city) set({ nearestCity: city });
+    });
+  },
 }));
 
 export { PRICE_BANDS };

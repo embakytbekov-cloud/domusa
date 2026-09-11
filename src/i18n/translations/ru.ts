@@ -74,7 +74,13 @@ export const ru = {
     photosHint: "Минимум 3 фото. Первое станет обложкой.",
     fieldAmenities: "Удобства",
     publish: "Опубликовать бесплатно",
+    publishPay: "Опубликовать за $3",
     publishing: "Публикуем…",
+    opening: "Открываем оплату…",
+    newListing: "+ Добавить объявление",
+    emptyListingsTitle: "У вас пока нет объявлений",
+    emptyListingsSub: "Разместите первое — это бесплатно",
+    backToList: "К моим объявлениям",
   },
   profile: {
     title: "Профиль",
@@ -109,6 +115,7 @@ export const ru = {
     profileConfirmed: "Профиль подтверждён через Telegram",
     fillRequired: "Заполните заголовок и цену",
     published: "Объявление опубликовано — оно уже в ленте",
+    publishError: "Не удалось опубликовать. Проверьте соединение и попробуйте ещё раз.",
   },
   amenity: {
     wifi: "Wi-Fi",
@@ -120,4 +127,16 @@ export const ru = {
     pets: "Питомцы",
   },
   languagePicker: { title: "Язык" },
+  publishSuccess: {
+    title: "Объявление опубликовано!",
+    sub: "Оно уже видно в разделе «Мои объявления».",
+    cta: "К моим объявлениям",
+  },
+  payment: {
+    cancelled: "Оплата отменена",
+    failed: "Оплата не прошла — попробуйте ещё раз",
+    processing: "Оплата прошла — публикуем объявление…",
+    unavailable: "Оплата сейчас недоступна",
+  },
+  geo: { nearYou: "Рядом с вами: {city}" },
 } satisfies Dict;

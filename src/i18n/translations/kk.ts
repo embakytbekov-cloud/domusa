@@ -72,7 +72,13 @@ export const kk = {
     photosHint: "Кемінде 3 фото. Біріншісі мұқаба болады.",
     fieldAmenities: "Ыңғайлылықтар",
     publish: "Тегін жариялау",
+    publishPay: "$3-ке жариялау",
     publishing: "Жариялануда…",
+    opening: "Төлемді ашып жатырмыз…",
+    newListing: "+ Хабарландыру қосу",
+    emptyListingsTitle: "Сізде әзірге хабарландыру жоқ",
+    emptyListingsSub: "Біріншісін орналастырыңыз — ол тегін",
+    backToList: "Менің хабарландыруларыма",
   },
   profile: {
     title: "Профиль",
@@ -107,6 +113,7 @@ export const kk = {
     profileConfirmed: "Профиль Telegram арқылы расталды",
     fillRequired: "Тақырып пен бағаны толтырыңыз",
     published: "Хабарландыру жарияланды — ол лентада бар",
+    publishError: "Жариялау сәтсіз аяқталды. Байланысты тексеріп, қайта көріңіз.",
   },
   amenity: {
     wifi: "Wi-Fi",
@@ -118,4 +125,16 @@ export const kk = {
     pets: "Үй жануарларына болады",
   },
   languagePicker: { title: "Тіл" },
+  publishSuccess: {
+    title: "Хабарландыру жарияланды!",
+    sub: "Ол «Менің хабарландыруларым» бөлімінде көрінеді.",
+    cta: "Менің хабарландыруларыма",
+  },
+  payment: {
+    cancelled: "Төлем тоқтатылды",
+    failed: "Төлем өтпеді — қайталап көріңіз",
+    processing: "Төлем өтті — хабарландыруды жариялап жатырмыз…",
+    unavailable: "Төлем қазір қолжетімсіз",
+  },
+  geo: { nearYou: "Сізге жақын: {city}" },
 } satisfies Dict;

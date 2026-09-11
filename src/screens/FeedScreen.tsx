@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { CATEGORIES } from "../data/constants";
 import { CITY_RAILS } from "../data/listings";
 import { useAppStore } from "../store/appStore";
@@ -6,18 +7,41 @@ import { passFilters } from "../lib/filters";
 import { ShapeIcon } from "../components/ShapeIcon";
 import { useT } from "../i18n";
 
+// Карта "город → ключ регионального рейла" — строится один раз из
+// исходных (нефильтрованных) CITY_RAILS, чтобы определять, какой рейл
+// поднять наверх по геолокации, даже когда активные фильтры сужают
+// список объектов внутри рейлов.
+const CITY_TO_RAIL_KEY = new Map<string, string>();
+CITY_RAILS.forEach((r) => r.items.forEach((l) => CITY_TO_RAIL_KEY.set(l.city, r.key)));
+
 export function FeedScreen() {
   const category = useAppStore((s) => s.category);
   const setCategory = useAppStore((s) => s.setCategory);
   const cityFilter = useAppStore((s) => s.cityFilter);
   const bandFilter = useAppStore((s) => s.bandFilter);
   const openFilters = useAppStore((s) => s.openFilters);
+  const nearestCity = useAppStore((s) => s.nearestCity);
   const t = useT();
 
-  const rails = CITY_RAILS.map((r) => ({
-    ...r,
-    items: r.items.filter((l) => passFilters(l, category, cityFilter, bandFilter)),
-  })).filter((r) => r.items.length > 0);
+  const rails = useMemo(() => {
+    const filtered = CITY_RAILS.map((r) => ({
+      ...r,
+      items: r.items.filter((l) => passFilters(l, category, cityFilter, bandFilter)),
+    })).filter((r) => r.items.length > 0);
+
+    // Геолокация (см. src/lib/geolocation.ts, запрашивается при старте
+    // приложения) поднимает рейл ближайшего к пользователю города наверх
+    // ленты — это и есть "приоритетный поиск по региону" из требования.
+    if (nearestCity) {
+      const railKey = CITY_TO_RAIL_KEY.get(nearestCity);
+      const idx = filtered.findIndex((r) => r.key === railKey);
+      if (idx > 0) {
+        const [near] = filtered.splice(idx, 1);
+        filtered.unshift(near);
+      }
+    }
+    return filtered;
+  }, [category, cityFilter, bandFilter, nearestCity]);
 
   const total = rails.reduce((sum, r) => sum + r.items.length, 0);
   const searchTitle = cityFilter.length ? cityFilter.join(", ") : t("feed.searchPlaceholder");
@@ -86,11 +110,18 @@ export function FeedScreen() {
         </div>
       </div>
 
-      {rails.map((r) => (
+      {rails.map((r, i) => (
         <div key={r.key} style={{ padding: "16px 0 2px", animation: "rise .3s ease" }}>
           <div style={{ padding: "0 18px 2px", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--ink)", letterSpacing: "-.4px" }}>{r.title}</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: "var(--ink)", letterSpacing: "-.4px", display: "flex", alignItems: "center", gap: 6 }}>
+                {r.title}
+                {i === 0 && nearestCity && CITY_TO_RAIL_KEY.get(nearestCity) === r.key && (
+                  <span style={{ fontSize: 10, fontWeight: 800, color: "var(--accent)", background: "var(--accent-soft-bg)", border: "1px solid var(--accent-soft-border)", borderRadius: 8, padding: "2px 6px" }}>
+                    {t("geo.nearYou", { city: nearestCity })}
+                  </span>
+                )}
+              </div>
               <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-50)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.sub}</div>
             </div>
             <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", textDecoration: "underline", flex: "none", cursor: "pointer" }}>{t("feed.viewAll")}</div>

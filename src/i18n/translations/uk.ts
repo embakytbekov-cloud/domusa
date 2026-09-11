@@ -72,7 +72,13 @@ export const uk = {
     photosHint: "Мінімум 3 фото. Перше стане обкладинкою.",
     fieldAmenities: "Зручності",
     publish: "Опублікувати безкоштовно",
+    publishPay: "Опублікувати за $3",
     publishing: "Публікуємо…",
+    opening: "Відкриваємо оплату…",
+    newListing: "+ Додати оголошення",
+    emptyListingsTitle: "У вас поки немає оголошень",
+    emptyListingsSub: "Розмістіть перше — це безкоштовно",
+    backToList: "До моїх оголошень",
   },
   profile: {
     title: "Профіль",
@@ -107,6 +113,7 @@ export const uk = {
     profileConfirmed: "Профіль підтверджено через Telegram",
     fillRequired: "Заповніть заголовок і ціну",
     published: "Оголошення опубліковано — воно вже у стрічці",
+    publishError: "Не вдалося опублікувати. Перевірте з'єднання і спробуйте ще раз.",
   },
   amenity: {
     wifi: "Wi-Fi",
@@ -118,4 +125,16 @@ export const uk = {
     pets: "Можна з тваринами",
   },
   languagePicker: { title: "Мова" },
+  publishSuccess: {
+    title: "Оголошення опубліковано!",
+    sub: "Воно вже видно в розділі «Мої оголошення».",
+    cta: "До моїх оголошень",
+  },
+  payment: {
+    cancelled: "Оплату скасовано",
+    failed: "Оплата не пройшла — спробуйте ще раз",
+    processing: "Оплата пройшла — публікуємо оголошення…",
+    unavailable: "Оплата зараз недоступна",
+  },
+  geo: { nearYou: "Поруч із вами: {city}" },
 } satisfies Dict;

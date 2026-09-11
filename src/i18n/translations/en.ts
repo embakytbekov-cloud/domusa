@@ -72,7 +72,13 @@ export const en = {
     photosHint: "At least 3 photos. The first one becomes the cover.",
     fieldAmenities: "Amenities",
     publish: "Publish for free",
+    publishPay: "Publish for $3",
     publishing: "Publishing…",
+    opening: "Opening payment…",
+    newListing: "+ Add listing",
+    emptyListingsTitle: "You don't have any listings yet",
+    emptyListingsSub: "Post your first one — it's free",
+    backToList: "To my listings",
   },
   profile: {
     title: "Profile",
@@ -107,6 +113,7 @@ export const en = {
     profileConfirmed: "Profile verified via Telegram",
     fillRequired: "Fill in the title and price",
     published: "Listing published — it's already live in the feed",
+    publishError: "Couldn't publish. Check your connection and try again.",
   },
   amenity: {
     wifi: "Wi-Fi",
@@ -118,4 +125,16 @@ export const en = {
     pets: "Pets allowed",
   },
   languagePicker: { title: "Language" },
+  publishSuccess: {
+    title: "Listing published!",
+    sub: "It's now visible in \"My listings\".",
+    cta: "To my listings",
+  },
+  payment: {
+    cancelled: "Payment cancelled",
+    failed: "Payment failed — please try again",
+    processing: "Payment received — publishing your listing…",
+    unavailable: "Payments are unavailable right now",
+  },
+  geo: { nearYou: "Near you: {city}" },
 } satisfies Dict;

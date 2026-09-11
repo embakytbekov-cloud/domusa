@@ -13,12 +13,14 @@ import { AddPublishBar } from "./components/AddPublishBar";
 import { FiltersSheet } from "./components/FiltersSheet";
 import { GateSheet } from "./components/GateSheet";
 import { LanguageSheet } from "./components/LanguageSheet";
+import { PublishSuccessModal } from "./components/PublishSuccessModal";
 import { Toast } from "./components/Toast";
 import { useT } from "./i18n";
 
 export default function App() {
   const screen = useAppStore((s) => s.screen);
   const tab = useAppStore((s) => s.tab);
+  const addView = useAppStore((s) => s.addView);
   const initUser = useAppStore((s) => s.initUser);
   const t = useT();
 
@@ -63,13 +65,14 @@ export default function App() {
       <div style={{ flex: 1, overflowY: "auto", overflowX: "hidden", position: "relative" }}>{body}</div>
 
       {isDetail && <DetailBookingBar />}
-      {!isDetail && tab === "add" && <AddPublishBar />}
+      {!isDetail && tab === "add" && addView === "form" && <AddPublishBar />}
 
       {showTabs && <TabBar />}
 
       <FiltersSheet />
       <GateSheet />
       <LanguageSheet />
+      <PublishSuccessModal />
       <Toast />
     </div>
   );

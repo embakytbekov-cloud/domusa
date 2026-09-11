@@ -72,7 +72,13 @@ export const uz = {
     photosHint: "Kamida 3 ta foto. Birinchisi muqova bo'ladi.",
     fieldAmenities: "Qulayliklar",
     publish: "Bepul e'lon qilish",
+    publishPay: "$3 ga e'lon qilish",
     publishing: "E'lon qilinmoqda…",
+    opening: "To'lov ochilmoqda…",
+    newListing: "+ E'lon qo'shish",
+    emptyListingsTitle: "Sizda hali e'lonlar yo'q",
+    emptyListingsSub: "Birinchisini joylashtiring — bu bepul",
+    backToList: "Mening e'lonlarimga",
   },
   profile: {
     title: "Profil",
@@ -107,6 +113,7 @@ export const uz = {
     profileConfirmed: "Profil Telegram orqali tasdiqlandi",
     fillRequired: "Sarlavha va narxni to'ldiring",
     published: "E'lon joylandi — u allaqachon lentada",
+    publishError: "Joylab bo'lmadi. Ulanishni tekshirib, qayta urinib ko'ring.",
   },
   amenity: {
     wifi: "Wi-Fi",
@@ -118,4 +125,16 @@ export const uz = {
     pets: "Uy hayvonlariga ruxsat",
   },
   languagePicker: { title: "Til" },
+  publishSuccess: {
+    title: "E'lon joylandi!",
+    sub: "U «Mening e'lonlarim» bo'limida ko'rinadi.",
+    cta: "Mening e'lonlarimga",
+  },
+  payment: {
+    cancelled: "To'lov bekor qilindi",
+    failed: "To'lov o'tmadi — qayta urinib ko'ring",
+    processing: "To'lov o'tdi — e'lon joylanmoqda…",
+    unavailable: "To'lov hozircha mavjud emas",
+  },
+  geo: { nearYou: "Sizga yaqin: {city}" },
 } satisfies Dict;

@@ -1,6 +1,7 @@
 import { useAppStore } from "../store/appStore";
 import { useCurrentListing } from "../lib/useCurrentListing";
 import { useT } from "../i18n";
+import { ListingMap } from "../components/ListingMap";
 
 export function DetailScreen() {
   const photoIndex = useAppStore((s) => s.photoIndex);
@@ -104,20 +105,24 @@ export function DetailScreen() {
       )}
 
       <div style={{ padding: "22px 20px 0" }}>
-        <div
-          style={{
-            height: 150,
-            borderRadius: 18,
-            border: "1px solid var(--ink-10)",
-            position: "relative",
-            overflow: "hidden",
-            background:
-              "repeating-linear-gradient(0deg,#e8e4dc 0 1px,transparent 1px 40px), repeating-linear-gradient(90deg,#e8e4dc 0 1px,transparent 1px 40px), linear-gradient(160deg,#f6f3ee,#eae5db)",
-          }}
-        >
-          <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 60, height: 60, borderRadius: 30, background: "rgba(47,111,94,.14)" }} />
-          <div style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: 16, height: 16, borderRadius: 8, background: "var(--accent)", border: "3px solid var(--surface)" }} />
-          <div style={{ position: "absolute", left: 14, bottom: 12, fontSize: 11.5, fontWeight: 700, color: "var(--ink-55)" }}>{t("detail.exactAddress")}</div>
+        <div style={{ borderRadius: 18, border: "1px solid var(--ink-10)", position: "relative", overflow: "hidden" }}>
+          <ListingMap city={listing.city} district={listing.district} />
+          <div
+            style={{
+              position: "absolute",
+              left: 14,
+              bottom: 10,
+              padding: "5px 10px",
+              borderRadius: 10,
+              background: "rgba(253,252,250,.92)",
+              fontSize: 11.5,
+              fontWeight: 700,
+              color: "var(--ink-55)",
+              pointerEvents: "none",
+            }}
+          >
+            {t("detail.exactAddress")}
+          </div>
         </div>
       </div>
     </div>
